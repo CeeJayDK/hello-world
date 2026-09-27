@@ -7,7 +7,7 @@ I'm CeeJay.dk and I write shaders.
 
 `.github/workflows/addon-scan.yml` runs daily, on demand and whenever `Addons.ini` changes, and scans every active add-on in `Addons.ini`
 (a test copy of [crosire/reshade-shaders `list` branch](https://github.com/crosire/reshade-shaders/blob/list/Addons.ini))
-with ClamAV and VirusTotal. A file counts as infected when 2 or more engines flag it.
+with ClamAV and VirusTotal. Scheduled and manual runs first refresh `Addons.ini` from crosire's list. A file counts as infected when 2 or more engines flag it.
 
 - `AddonsScan.ini` – machine-readable result per section (`Status=Clean|Infected|Unknown`) for the setup to read.
 - `Addons.ini` – infected sections are commented out automatically.

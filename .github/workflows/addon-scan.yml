@@ -22,6 +22,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Start from crosire's current list. Previously commented-out add-ons are re-scanned and stay
+      # disabled only if still infected. Skipped on push, so manual edits to Addons.ini can be tested.
+      - name: Refresh Addons.ini from crosire/reshade-shaders
+        if: github.event_name != 'push'
+        continue-on-error: true  # scan the existing copy if the download fails
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/crosire/reshade-shaders/list/Addons.ini -o "$RUNNER_TEMP/Addons.ini"
+          mv "$RUNNER_TEMP/Addons.ini" Addons.ini
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
