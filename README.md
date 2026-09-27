@@ -11,6 +11,7 @@ with ClamAV and VirusTotal. A file counts as infected when 2 or more engines fla
 
 - `AddonsScan.ini` – machine-readable result per section (`Status=Clean|Infected|Unknown`) for the setup to read.
 - `Addons.ini` – infected sections are commented out automatically.
+- If anything is infected the run fails, which makes GitHub email you.
 
 Setup: add a free VirusTotal API key as the repository secret `VT_API_KEY`
 (Settings → Secrets and variables → Actions).

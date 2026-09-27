@@ -36,6 +36,7 @@ jobs:
         run: sudo freshclam
 
       - name: Scan add-ons
+        id: scan
         env:
           VT_API_KEY: ${{ secrets.VT_API_KEY }}
           MIN_DETECTIONS: '2'
@@ -52,3 +53,10 @@ jobs:
             git commit -m "Update add-on virus scan results"
             git push
           fi
+
+      # A failed run makes GitHub send an email alert (Settings > Notifications > Actions)
+      - name: Alert on infected add-ons
+        if: steps.scan.outputs.infected != '0'
+        run: |
+          echo "::error::${{ steps.scan.outputs.infected }} infected add-on(s) found and commented out in Addons.ini - see the run summary"
+          exit 1
