@@ -5,7 +5,7 @@ I'm CeeJay.dk and I write shaders.
 
 ## Add-on virus scan (proof of concept)
 
-`.github/workflows/addon-scan.yml` runs daily (and on demand) and scans every active add-on in `Addons.ini`
+`.github/workflows/addon-scan.yml` runs daily, on demand and whenever `Addons.ini` changes, and scans every active add-on in `Addons.ini`
 (a test copy of [crosire/reshade-shaders `list` branch](https://github.com/crosire/reshade-shaders/blob/list/Addons.ini))
 with ClamAV and VirusTotal. A file counts as infected when 2 or more engines flag it.
 
