@@ -8,7 +8,7 @@ I'm CeeJay.dk and I write shaders.
 `.github/workflows/addon-scan.yml` runs daily, on demand and whenever `Addons.ini` changes, and scans every active add-on in `Addons.ini`
 (a test copy of [crosire/reshade-shaders `list` branch](https://github.com/crosire/reshade-shaders/blob/list/Addons.ini))
 with ClamAV and VirusTotal. Scheduled and manual runs first refresh `Addons.ini` from crosire's list. A file counts as infected when ClamAV flags it, or when 2 or more VirusTotal engines flag it.
-Entries that only link a GitHub repository are checked through every file of that repository's latest release.
+Entries that only link a GitHub repository are checked through every file of that repository's latest release (or its newest pre-release if it only has pre-releases).
 
 Files are identified by the SHA-256 of their content, never by name or URL. ClamAV scans everything on every run;
 VirusTotal is only asked about new files and, about once a week, re-checks known ones (at most 250 requests per run,
