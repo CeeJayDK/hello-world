@@ -138,16 +138,24 @@ def github_get(url, **params):
 
 
 def latest_release(repository_url):
-    """Return (tag, html_url, [(name, download_url)]), or None if the repo has no release."""
+    """Return (tag, html_url, [(name, download_url)]), or None if the repo has no release.
+
+    Uses the latest full release, or the newest pre-release if there is none.
+    """
     m = GITHUB_REPO_RE.match(repository_url)
     if not m:
         return None
     owner, repo = m.group("owner"), m.group("repo").removesuffix(".git")
     r = github_get(f"https://api.github.com/repos/{owner}/{repo}/releases/latest")
-    if r.status_code == 404:
-        return None
-    r.raise_for_status()
-    release = r.json()
+    if r.status_code == 404:  # "latest" skips pre-releases, so fall back to the newest release of any kind
+        r = github_get(f"https://api.github.com/repos/{owner}/{repo}/releases", per_page=1)
+        r.raise_for_status()
+        if not r.json():
+            return None
+        release = r.json()[0]
+    else:
+        r.raise_for_status()
+        release = r.json()
     assets = []
     page = 1
     while True:  # the release object lists assets incompletely for big releases, so page through them
@@ -178,6 +186,9 @@ def section_files(section):
         log(f"  {section['error']}")
         return []
     if release is None:
+        section["notice"] = ("repository has no GitHub releases" if GITHUB_REPO_RE.match(values["RepositoryUrl"])
+                             else "not a GitHub repository, no release to scan")
+        log(f"[{section['name']}] {section['notice']}")
         return []
     tag, html_url, assets = release
     section["release"] = {"tag": tag, "url": html_url, "files": len(assets)}
@@ -429,7 +440,7 @@ def main():
               f"{PENDING} = not checked yet | {UNKNOWN} = could not be checked).\n",
               f"; VirusTotal counts as {INFECTED} when >= {MIN_DETECTIONS} of its engines flag a file.\n",
               "; Sections without DownloadUrl entries are checked through all files of their latest GitHub\n",
-              "; release; only files that are not Clean are listed for those.\n"]
+              "; release (or newest pre-release); only files that are not Clean are listed for those.\n"]
     flagged = []
     summary = []
     for section in sections:
@@ -483,8 +494,8 @@ def main():
         if "release" in section:
             head += [f"Release={section['release']['tag']}\n", f"ReleaseUrl={section['release']['url']}\n",
                      f"ReleaseFiles={section['release']['files']}\n"]
-        if section.get("error"):
-            head.append(f"Error={section['error']}\n")
+        if section.get("error") or section.get("notice"):
+            head.append(f"Error={section.get('error') or section['notice']}\n")
         report += ["\n"] + head + entries
 
         if vt_section in (CLEAN, INFECTED):
